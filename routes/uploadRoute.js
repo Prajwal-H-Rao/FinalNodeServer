@@ -14,7 +14,8 @@ router.post(
   authenticate,
   upload.single("audio"),
   async function (res, req) {
-    if (!req.file) res.status(400).json({ message: "File not uploaded" });
+    if (!req.file)
+      return res.status(400).json({ message: "File not uploaded" });
     const userEmail = req.user.email; //may cause issues later so check here
     const userDir = path.join(
       "uploads",
@@ -37,9 +38,10 @@ router.get("/uploads/:email", authenticate, async function (req, res) {
   const email = req.params.email;
   const userDir = path.join("uploads", email);
   if (!fs.existsSync(userDir))
-    res.status(404).json({ message: "No files found for the user" });
+    return res.status(404).json({ message: "No files found for the user" });
   fs.readdir(userDir, function (err, subdirs) {
-    if (err) res.status(500).json({ message: "Error reading directory" });
+    if (err)
+      return res.status(500).json({ message: "Error reading directory" });
     const fileContents = [];
     subdirs.forEach(function (subdir) {
       const subdirPath = path.join(userDir, subdir);
@@ -52,7 +54,7 @@ router.get("/uploads/:email", authenticate, async function (req, res) {
         });
       }
     });
-    res.json({ files: fileContents });
+    return res.json({ files: fileContents });
   });
 });
 
@@ -69,12 +71,12 @@ router.get(
       req.params.file
     );
     if (fs.existsSync(filePath)) {
-      res.download(filePath, req.params.file, (error) => {
+      return res.download(filePath, req.params.file, (error) => {
         console.log("Error sending files");
-        res.status(500).json({ message: "Error downloading files" });
+        return res.status(500).json({ message: "Error downloading files" });
       });
     } else {
-      res.status(404).json({ message: "File not found" });
+      return res.status(404).json({ message: "File not found" });
     }
   }
 );
