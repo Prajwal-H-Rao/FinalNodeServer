@@ -1,7 +1,7 @@
-FROM node:alpine
+FROM node:18
 
-# Install ffmpeg in the container using apk
-RUN apk update && apk add --no-cache ffmpeg
+# Install ffmpeg in the container
+RUN apt-get update && apt-get install -y ffmpeg && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app
 
