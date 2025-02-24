@@ -3,9 +3,10 @@ const { GoogleGenerativeAI } = require("@google/generative-ai");
 const genai = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 const model = genai.getGenerativeModel({ model: "gemini-2.0-flash" });
 const Ffmpeg = require("fluent-ffmpeg");
+Ffmpeg.setFfmpegPath(process.env.FFMPEG_PATH); // Ensure FFMPEG_PATH is set to the ffmpeg executable path
 const fs = require("fs");
 const path = require("path");
-const formData = require("form-data");
+const FormData = require("form-data");
 
 async function getGeminiResponse(promt) {
   try {
@@ -16,18 +17,19 @@ async function getGeminiResponse(promt) {
   }
 }
 
-function tracriptionFunction(audioPath, outputPath, userDir, req) {
+function tracriptionFunction(audioPath, outputPath, userDir, req, res) {
   Ffmpeg(audioPath)
     .output(outputPath)
     .audioFrequency(16000)
     .on("end", async function () {
       try {
         const audiFile = fs.createReadStream(outputPath);
-        const formData = new FormData();
-        formData.append("file", audiFile);
+        const form = new FormData();
+        // Change field key from "file" to "audio"
+        form.append("audio", audiFile);
         axios
-          .post(`${process.env.FLASK_URI}/transcribe`, formData, {
-            headers: formData.getHeaders(),
+          .post(`${process.env.FLASK_URI}/transcribe`, form, {
+            headers: form.getHeaders(),
           })
           .then(async function (response) {
             const transcriptionPath = path.join(

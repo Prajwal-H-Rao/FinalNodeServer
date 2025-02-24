@@ -5,6 +5,7 @@ const cors = require("cors");
 const mongoose = require("mongoose");
 
 const authRouter = require("./routes/authRoute.js");
+const uploadRouter = require("./routes/uploadRoute.js");
 
 const app = express();
 const port = process.env.PORT || 3000;
@@ -15,6 +16,7 @@ app.use(express.urlencoded({ extended: true }));
 
 app.use(express.static("uploads"));
 app.use("/auth", authRouter);
+app.use("/", uploadRouter);
 
 //default routes
 app.get("/", function (req, res) {
