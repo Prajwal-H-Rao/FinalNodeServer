@@ -7,12 +7,9 @@ const fs = require("fs");
 const path = require("path");
 const FormData = require("form-data");
 
-// Use resolved ffmpeg path: if process.env.FFMPEG_PATH is relative, resolve it relative to project root.
-const ffmpegEnvPath = process.env.FFMPEG_PATH || "/usr/bin/ffmpeg";
-const resolvedFfmpegPath = path.isAbsolute(ffmpegEnvPath)
-  ? ffmpegEnvPath
-  : path.join(__dirname, "..", ffmpegEnvPath);
-Ffmpeg.setFfmpegPath(resolvedFfmpegPath);
+// Updated ffmpeg path logic as per Docker setup:
+const ffmpegPath = process.env.FFMPEG_PATH || "ffmpeg";
+Ffmpeg.setFfmpegPath(ffmpegPath);
 
 async function getGeminiResponse(promt) {
   try {
