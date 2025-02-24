@@ -1,4 +1,4 @@
-FROM node:14
+FROM node:alpine
 
 # Install ffmpeg in the container
 RUN apt-get update && apt-get install -y ffmpeg && rm -rf /var/lib/apt/lists/*
