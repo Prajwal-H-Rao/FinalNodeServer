@@ -13,7 +13,7 @@ router.post(
   "/upload",
   authenticate,
   upload.single("audio"),
-  async function (res, req) {
+  async function (req, res) {
     if (!req.file)
       return res.status(400).json({ message: "File not uploaded" });
     const userEmail = req.user.email; //may cause issues later so check here
@@ -30,7 +30,7 @@ router.post(
       userDir,
       `${path.parse(req.file.originalname).name}.wav`
     );
-    tracriptionFunction(audioPath, outputPath, userDir, req);
+    tracriptionFunction(audioPath, outputPath, userDir, req, res);
   }
 );
 

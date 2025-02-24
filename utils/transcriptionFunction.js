@@ -3,10 +3,16 @@ const { GoogleGenerativeAI } = require("@google/generative-ai");
 const genai = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 const model = genai.getGenerativeModel({ model: "gemini-2.0-flash" });
 const Ffmpeg = require("fluent-ffmpeg");
-Ffmpeg.setFfmpegPath(process.env.FFMPEG_PATH); // Ensure FFMPEG_PATH is set to the ffmpeg executable path
 const fs = require("fs");
 const path = require("path");
 const FormData = require("form-data");
+
+// Use resolved ffmpeg path: if process.env.FFMPEG_PATH is relative, resolve it relative to project root.
+const ffmpegEnvPath = process.env.FFMPEG_PATH || "/usr/bin/ffmpeg";
+const resolvedFfmpegPath = path.isAbsolute(ffmpegEnvPath)
+  ? ffmpegEnvPath
+  : path.join(__dirname, "..", ffmpegEnvPath);
+Ffmpeg.setFfmpegPath(resolvedFfmpegPath);
 
 async function getGeminiResponse(promt) {
   try {
@@ -46,23 +52,25 @@ function tracriptionFunction(audioPath, outputPath, userDir, req, res) {
               transcriptionPath,
               `\n\nSummary:\n${translatedAndRefinedData}`
             );
-            res.status(200).json({
+            return res.status(200).json({
               message: "Transcibed sucessfully",
               transcription: translatedAndRefinedData,
             });
           })
           .catch(function (error) {
             console.error("Error:", error);
-            res.status(500).json({ message: "Transcription service error" });
+            return res
+              .status(500)
+              .json({ message: "Transcription service error" });
           });
       } catch (error) {
         console.error("Transcription failed:", error);
-        res.status(500).json({ message: "Transcription failed" });
+        return res.status(500).json({ message: "Transcription failed" });
       }
     })
     .on("error", function (err) {
       console.error("FFmpeg Error:", err);
-      res.status(500).json({ message: "Audio processing failed" });
+      return res.status(500).json({ message: "Audio processing failed" });
     })
     .run();
 }
