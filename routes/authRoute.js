@@ -29,7 +29,6 @@ router.post("/login", async function (req, res) {
     if (!user)
       return res.status(404).json({ message: "The user is not registered" });
     const isMatch = await bcrypt.compare(password, user.password);
-    console.log(isMatch, user.password);
     if (!isMatch)
       return res.status(401).json({ message: "Invalid credentials" });
     const token = jwt.sign(
