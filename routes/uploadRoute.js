@@ -30,7 +30,7 @@ router.post(
       userDir,
       `${path.parse(req.file.originalname).name}.wav`
     );
-    console.log('trancribing....);
+    console.log('trancribing....');
     tracriptionFunction(audioPath, outputPath, userDir, req, res);
   }
 );
